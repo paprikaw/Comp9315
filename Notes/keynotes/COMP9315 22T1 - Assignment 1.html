@@ -1,0 +1,541 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>COMP9315 22T1 - Assignment 1</title>
+<link href="COMP9315%2022T1%20-%20Assignment%201_files/bootstrap.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="COMP9315%2022T1%20-%20Assignment%201_files/course.css">
+</head>
+<body>
+<div class="container">
+
+<div align="center">
+<table width="100%" border="0">
+<tbody><tr valign="top">
+<td width="25%" align="left">
+  <span class="tiny"><a href="https://cgi.cse.unsw.edu.au/~cs9315/22T1">COMP9315 22T1</a></span>
+</td>
+<td width="50%" align="center">
+  <span class="heading">Assignment 1</span><br>
+  <span class="subheading">Adding a PersonName Data Type to PostgreSQL</span>
+</td>
+<td width="25%" align="right">
+  <span class="tiny"><a href="https://cgi.cse.unsw.edu.au/~cs9315/22T1">DBMS Implementation</a></span>
+</td>
+</tr></tbody></table>
+</div><div style="text-align:center;font-size:80%;color:#555555;margin-top:5px;">
+Last updated: <b>Tuesday 22nd February 2:16pm</b> <br>
+Most recent changes are shown in <span class="red">red</span> ...
+older changes are shown in <span class="brown">brown</span>. <br>
+</div>
+<h2>Aims</h2>
+<p>
+This assignment aims to give you
+</p>
+<ul>
+<li> an understanding of how data is treated inside a DBMS
+</li><li> practice in adding a new base type to PostgreSQL
+</li></ul>
+<p>
+The goal is to implement a new data type for PostgreSQL, complete
+with input/output functions, comparison operators, formatting
+functions, and the ability to build indexes on values of the type.
+</p>
+
+<h2>Summary</h2>
+
+<dl class="dl-horizontal">
+<dt>Deadline</dt>
+  <dd>Friday 18 March, 9:00pm</dd>
+<br>
+<dt>Pre-requisites:</dt>
+  <dd>before starting this assignment,
+  it would be useful to complete
+  <a href="https://cgi.cse.unsw.edu.au/~cs9315/22T1/pracs/p04/">Prac Work P04</a></dd>
+<br>
+<dt>Late Penalty:</dt>
+  <dd>0.04 <em>marks</em> off the ceiling mark for each <em>hour</em> late</dd>
+<br>
+<dt>Marks:</dt>
+  <dd> This assignment contributes <b>15 marks</b> toward your total mark for this course.</dd>
+<br>
+<dt>Submission:</dt>
+  <dd><a href="https://webcms3.cse.unsw.edu.au/COMP9315/22T1/">Webcms3</a>
+  &gt; Assignments &gt; Ass1 Submission &gt; Make Submission
+  <br>
+  or, on CSEmachines, <code>give cs9315 ass1 pname.c pname.source</code></dd>
+</dl>
+<p>
+Make sure that you read this assignment specification <em>carefully and
+completely</em> before starting work on the assignment.<br>
+Questions which indicate that you haven't done this will simply get the
+response "Please read the spec".
+</p>
+<p>
+We use the following names in the discussion below
+</p>
+<ul>
+<li> <tt><i>PG_CODE</i></tt> ...  the directory where your PostgreSQL source code is located
+	&nbsp; <small>(typically <tt>/localstorage/<i>YOU</i>/postgresql-14.1/</tt>)</small>
+</li><li> <tt><i>PG_HOME</i></tt> ... the directory where you have installed the PostgreSQL binaries
+	&nbsp; <small>(typically <tt>/localstorage/<i>YOU</i>/pgsql/bin/</tt>)</small>
+</li><li> <tt><i>PG_DATA</i></tt> ... the directory where you have placed PostgreSQL's <tt>data</tt>
+	&nbsp; <small>(typically <tt>/localstorage/<i>YOU</i>/pgsql/data/</tt>)</small>
+</li><li> <tt><i>PG_LOG</i></tt> ... the file where you send PostgreSQL's log output
+	&nbsp; <small>(typically <tt>/localstorage/<i>YOU</i>/pgsql/data/log</tt>)</small>
+</li></ul>
+
+<h2>Introduction</h2>
+
+<p>
+PostgreSQL has an extensibility model which, among other things,
+provides a well-defined process for adding new data types into
+a PostgreSQL server.
+This capability has led to the development by PostgreSQL users
+of a number of types (such as polygons) which have become part
+of the standard distribution.
+It also means that PostgreSQL is the database of choice in research
+projects which aim to push the boundaries of what kind of data a
+DBMS can manage.
+</p>
+<p>
+In this assignment, we will be adding a new data type for dealing
+with people's names.
+"Hmmm", you say, "but aren't they just text strings, typically
+implemented as two attributes, one for family name and one for
+given names?".
+That may be true, but making names into a separate base data type
+allows us to explore how we store and manipulate them.
+</p>
+<p>
+One common way of writing names (e.g. used in UNSW student systems) is
+</p>
+<pre>Shepherd,John Andrew
+Lin,Xuemin
+Eilish,Billie
+Martin, Eric Andre
+Lakshminarasimhan,Venkateswaran Chandrasekara
+Marshall-Martin, Sally Angela
+Featherstone,Albert Basil Ernest George Harold Randolph William
+i.e.
+<i>FamilyName</i>,<i>GivenNames</i>
+</pre>
+<p>
+We give a more precise description of what text strings are valid
+<code>PersonName</code>s below.
+</p>
+<h4>Adding Data Types in PostgreSQL</h4>
+<p>
+The process for adding new base data types in PostgreSQL is described
+in the following sections of the PostgreSQL documentation:
+</p>
+<ul>
+<li> <a target="_blank" href="https://www.postgresql.org/docs/14/xtypes.html">37.13 User-defined Types</a>
+</li><li> <a target="_blank" href="https://www.postgresql.org/docs/14/xfunc-c.html">37.10 C-Language Functions</a>
+</li><li> <a target="_blank" href="https://www.postgresql.org/docs/14/xoper.html">37.14 User-defined Operators</a>
+</li><li> <a target="_blank" href="https://www.postgresql.org/docs/14/sql-createtype.html">SQL: CREATE TYPE</a>
+</li><li> <a target="_blank" href="https://www.postgresql.org/docs/14/sql-createoperator.html">SQL: CREATE OPERATOR</a>
+</li><li> <a target="_blank" href="https://www.postgresql.org/docs/14/sql-createopclass.html">SQL: CREATE OPERATOR CLASS</a>
+</li></ul>
+<p>
+Section 37.13 uses an example of a complex number type, which you can use as
+a starting point for defining your <tt>PersonName</tt> data type (see below).
+There are other examples of new data types under the directories:
+</p>
+<ul>
+<li> <tt><i>PG_CODE</i>/contrib/chkpass/</tt> ... an auto-encrypted password datatype
+</li><li> <tt><i>PG_CODE</i>/contrib/citext/</tt> ... a case-insensitive character string datatype
+</li><li> <tt><i>PG_CODE</i>/contrib/seg/</tt> ... a confidence-interval datatype
+</li></ul>
+<p>
+These may or may not give you some useful ideas on how to implement the
+PersonName data type.
+For example, many of these data types are fixed-size, while
+<tt>PersonName</tt>s are variable-sized.
+A potentially useful example of implementing variable-sized types
+can be found in:
+</p>
+<ul>
+<li> <tt><i>PG_CODE</i>/src/tutorial/funcs.c</tt> ... implementation of several data types
+</li></ul>
+
+<h2>Setting Up</h2>
+
+<p>
+You ought to start this assignment with a fresh copy of PostgreSQL,
+without any changes that you might have made for the Prac exercises
+(unless these changes are trivial).
+Note that you only need to configure, compile and install your
+PostgreSQL server once for this assignment.
+All subsequent compilation takes place in the <tt>src/tutorial</tt>
+directory, and only requires modification of the files there.
+</p>
+<p>
+Once you have re-installed your PostgreSQL server, you should run
+the following commands:
+</p>
+<pre>$ <b>cd <i>PG_CODE</i>/src/tutorial</b>
+$ <b>cp complex.c pname.c</b>
+$ <b>cp complex.source pname.source</b>
+</pre>
+<p>
+Note the <tt>pname.*</tt> files will contain <i>many</i>
+references to <tt>complex</tt>; I do not want to see
+any remaining occurences of the word <tt>complex</tt>
+in the files that you eventually submit.
+These files simply provide a template in which you
+create <em>your</em> <tt>PersonName</tt> type.
+</p>
+<p>
+Once you've made the <tt>pname.*</tt> files, you should also edit the
+<tt>Makefile</tt> in this directory and add the
+<span class="green">green</span> text to the following lines:
+</p>
+<pre>MODULES = complex funcs <span class="green">pname</span>
+DATA_built = advanced.sql basics.sql complex.sql funcs.sql syscat.sql <span class="green">pname.sql</span>
+</pre>
+<p>
+The rest of the work for this assignment involves editing only the
+<tt>pname.c</tt> and <tt>pname.source</tt> files.
+In order for the <tt>Makefile</tt> to work properly, you must use
+the identifier <tt>_OBJWD_</tt> in the <tt>pname.source</tt> file
+to refer to the directory holding the compiled library.
+You should never modify directly the <tt>pname.sql</tt> file produced
+by the <tt>Makefile</tt>.
+Place <em>all</em> of your C code in the <tt>pname.c</tt> file;
+do not create any other <code>*.c</code> files.
+</p>
+<p>
+Note that your submitted versions of <tt>pname.c</tt> and <tt>pname.source</tt>
+should not contain any references to the <tt>complex</tt> type. Make sure that
+the documentation (comments in program) describes the code that <i>you</i>
+wrote.
+Leaving the word <tt>complex</tt> anywhere in a <tt>pname.*</tt> file will
+cost 1 mark.
+</p>
+
+<a name="semantics"></a>
+<h2>The Person Name Data Type</h2>
+
+<p>
+We wish to define a new base type <tt>PersonName</tt> to represent
+people's names, in the format <tt><i>FamilyName</i>,<i>GivenNames</i></tt>.
+We also aim to define a useful set of operations on values of type
+<tt>PersonName</tt> and wish to be able to create indexes on <tt>PersonName</tt>
+attributes.
+How you represent <tt>PersonName</tt> values internally, and how you
+implement the functions to manipulate them internally, is up to you.
+However, they must satisfy the requirements below.
+</p>
+<p>
+Once implemented correctly, you should be able to use your PostgreSQL
+server to build the following kind of SQL applications:
+</p>
+<pre>create table Students (
+   zid       integer primary key,
+   name      PersonName not null,
+   degree    text,
+   -- etc. etc.
+);
+
+insert into Students(zid,name,degree) values
+(9300035,'Shepherd, John Andrew', 'BSc(Computer Science)'),
+(5012345,'Smith, Stephen', 'BE(Hons)(Software Engineering)');
+
+create index on Students using hash (name);
+
+select a.zid, a.name, b.zid
+from   Students a join Students b on (a.name = b.name);
+
+select family(name), given(name), show(name)
+from   Students;
+
+select name,count(*)
+from   Students
+group  by name;
+</pre>
+<p>
+Having defined a hash-based file structure, we would expect that the
+queries would make use of it. You can check this by adding the keyword
+<tt>EXPLAIN</tt> before the query, e.g.
+</p>
+<pre>db=# <b>explain analyze select * from Students where name='Smith,John';</b>
+</pre>
+<p>
+which should, once you have correctly implemented the data type
+and loaded sufficient data, show that an index-based scan of the
+data is being used.
+Note that this will only be evident if you use a large amount
+of data (e.g. one of the larger test data samples to be provided).
+</p>
+
+<h3>Person Name values</h3>
+
+<p>
+Valid <code>PersonName</code>s will have the above format
+with the following qualifications:
+</p>
+<ul>
+<li>there may be a single space after the comma</li>
+<li> there will be <b>no</b> people with just one name (e.g. <em>no</em> Prince, Jesus, Aristotle, etc.)
+</li><li>there will be <b>no</b> numbers (e.g. <em>no</em>Gates, William 3rd)
+</li><li>there will be <b>no</b> titles (e.g. <em>no</em> Dr, Prof, Mr, Ms)
+</li><li>there will be <b>no</b> initials (e.g. <em>no</em> Shepherd,John A)
+</li></ul>
+<p>
+In other words, you can ignore the possibility of certain types of names
+while implementing your input and output functions.
+</p>
+<p>
+A more precise definition can be given using a BNF grammar:
+</p>
+<pre>PersonName ::= Family','Given | Family', 'Given
+
+Family     ::= NameList
+Given      ::= NameList
+
+NameList   ::= Name | Name' 'NameList
+
+Name       ::= Upper Letters
+
+Letter     ::= Upper | Lower | Punc
+
+Letters    ::= Letter | Letter Letters
+
+Upper      ::= 'A' | 'B' | ... | 'Z'
+Lower      ::= 'a' | 'b' | ... | 'z'
+Punc       ::= '-' | "'"
+</pre>
+<p>
+You should not make any assumptions about the maximum length of
+a <tt>PersonName</tt>.
+</p>
+<p>
+Under this syntax, the following are valid names:
+</p>
+<pre>Smith,John
+Smith, John
+O'Brien, Patrick Sean
+Mahagedara Patabendige,Minosha Mitsuaki Senakasiri
+I-Sun, Chen Wang
+Clifton-Everest,Charles Edward
+</pre>
+<p>
+The following names are <em>not</em> valid in our system:
+</p>
+<pre>Jesus                     <span class="comment"># no single-word names</span>
+Smith  ,  Harold          <span class="comment"># space before the ","</span>
+Gates, William H., III    <span class="comment"># no initials, too many commas</span>
+A,B C                     <span class="comment"># names must at least 2 letters</span>
+Smith, john               <span class="comment"># names begin with an upper-case letter</span>
+</pre>
+<p>
+Think about why each of the above is invalid in terms of the
+syntax definition.
+</p>
+<p>
+<b>Important</b>: for this assignment, we define an ordering on
+names as follows:
+</p>
+<ul>
+<li> the ordering is determined initially by the ordering on the Family Name
+</li><li> if the Family Names are equal, then the ordering is determined by the Given Names
+</li><li> ordering of parts is determined lexically
+</li></ul>
+<p>
+There are examples of how this works in the section on
+<a href="#operations">Operations on <tt>PersonName</tt>s</a> below.
+
+
+</p><h3>Representing Person Names</h3>
+<p>
+The first thing you need to do is to decide on an internal representation
+for your <tt>PersonName</tt> data type.
+You should do this, however, after you have looked at the description of
+the operators below, since what they require may affect how you decide
+to structure your internal <tt>PersonName</tt> values.
+</p>
+<p>
+When you read strings representing <tt>PersonName</tt> values, they
+are converted into your internal form, stored in the database in this form,
+and operations on <tt>PersonName</tt> values are carried out using this
+data structure.
+It is useful to define a <em>canonical form</em> for names, which may
+be slightly different to the form in which they are read (e.g.
+"Smith, John" might be rendered as "Smith,John").
+When you display <tt>PersonName</tt> values, you should show them in
+canonical form, regardless of how they were entered or how they are stored.
+</p><p>
+The first functions you need to write are ones to read and display
+values of type <tt>PersonName</tt>. You should write analogues of the
+functions <tt>complex_in()</tt>, <tt>complex_out</tt> that are defined
+in the file <tt>complex.c</tt>.
+Call them, e.g., <tt>pname_in()</tt> and <tt>pname_out()</tt>.
+Make sure that you use the <tt>V1</tt> style function interface (as is
+done in <tt>complex.c</tt>).
+</p>
+<p>
+Note that the two input/output functions should be complementary, meaning
+that any string displayed by the output function must be able to be read
+using the input function.
+There is no requirement for you to retain the precise string that was
+used for input (e.g. you could store the <tt>PersonName</tt> value
+internally in a different form such as splitting it into two strings:
+one for the family name(s), and one for the given name(s)).
+</p>
+<p>
+One thing that <tt>pname_in()</tt> must do is determine whether the
+name has the correct structure (according to the grammar above).
+Your <tt>pname_out()</tt> should display each name in a format that
+can be read by <tt>pname_in()</tt>.
+</p>
+<p>
+Note that you are <em>not</em> required to define binary input/output functions,
+called <tt>receive_function</tt> and <tt>send_function</tt> in the
+PostgreSQL documentation, and called <tt>complex_send</tt> and
+<tt>complex_recv</tt> in the <tt>complex.c</tt>file.
+</p>
+<p>
+As noted above, you cannot assume anything about the maximum length of
+names.
+If your solution uses two fixed-size buffers (one for family, one for given)
+then your mark is limited to 6/10.
+</p>
+
+<a name="operations"></a>
+<h3>Operations on person names</h3>
+<p>
+You must implement all of the following operations for the <tt>PersonName</tt>
+type:
+</p><ul>
+<li>
+<p>
+<b><i>PersonName<sub>1</sub> = PersonName<sub>2</sub></i></b> ...
+two names are equal
+</p>
+<p>
+Two <tt>PersonName</tt>s are equivalent if,
+they have the same family name(s) and the same given name(s).
+</p>
+<pre>PersonName<sub>1</sub>: Smith,John
+PersonName<sub>2</sub>: Smith, John
+PersonName<sub>3</sub>: Smith, John David
+PersonName<sub>4</sub>: Smith, James
+
+(PersonName<sub>1</sub> = PersonName<sub>1</sub>) is true
+(PersonName<sub>1</sub> = PersonName<sub>2</sub>) is true
+(PersonName<sub>2</sub> = PersonName<sub>1</sub>) is true        <i>(commutative)</i>
+(PersonName<sub>2</sub> = PersonName<sub>3</sub>) is false
+(PersonName<sub>2</sub> = PersonName<sub>4</sub>) is false
+</pre>
+</li><li>
+<p>
+<b><i>PersonName<sub>1</sub> &gt; PersonName<sub>2</sub></i></b> ...
+the first <tt>PersonName</tt> is greater than the second
+</p><p>
+<i>PersonName<sub>1</sub></i> is greater than <i>PersonName<sub>2</sub></i> if
+the Family part of <i>PersonName<sub>1</sub></i> is lexically greater
+than the Family part of <i>PersonName<sub>2</sub></i>.
+If the Family parts are equal, then <i>PersonName<sub>1</sub></i> is greater than <i>PersonName<sub>2</sub></i> if the Given part of <i>PersonName<sub>1</sub></i>
+is lexically greater than the Given part of <i>PersonName<sub>2</sub></i>.
+</p>
+<pre>PersonName<sub>1</sub>: Smith,James
+PersonName<sub>2</sub>: Smith,John
+PersonName<sub>3</sub>: Smith,John David
+PersonName<sub>4</sub>: Zimmerman, Trent
+
+(PersonName<sub>1</sub> &gt; PersonName<sub>2</sub>) is false
+(PersonName<sub>1</sub> &gt; PersonName<sub>3</sub>) is false
+(PersonName<sub>3</sub> &gt; PersonName<sub>2</sub>) is true
+(PersonName<sub>1</sub> &gt; PersonName<sub>1</sub>) is false
+(PersonName<sub>4</sub> &gt; PersonName<sub>3</sub>) is true
+</pre>
+</li><li>
+<p>
+Other operations: &nbsp; <b><tt>&lt;&gt;</tt></b>, &nbsp; <b><tt>&gt;=</tt></b>, &nbsp;
+<b><tt>&lt;</tt></b>, &nbsp; <b><tt>&lt;=</tt></b>
+</p>
+<p>
+You should also implement the above operations, whose semantics is
+hopefully obvious from the descriptions above.
+The operators can typically be implemented quite simply in terms of
+the first two operators.
+</p>
+</li>
+<li>
+<p>
+<b>family(<i>PersonName</i>)</b> returns just the Family part of a name
+</p>
+<pre>PersonName<sub>1</sub>: Smith,James
+PersonName<sub>2</sub>: O'Brien,Patrick Sean
+PersonName<sub>3</sub>: Mahagedara Patabendige,Minosha Mitsuaki Senakasir
+PersonName<sub>4</sub>: Clifton-Everest,David Ewan
+
+family(PersonName<sub>1</sub>) returns "Smith"
+family(PersonName<sub>2</sub>) returns "O'Brien"
+family(PersonName<sub>3</sub>) returns "Mahagedara Patabendige"
+family(PersonName<sub>4</sub>) returns "Clifton-Everest"
+</pre>
+</li>
+<li>
+<p>
+<b>given(<i>PersonName</i>)</b> returns just the Given part of a name
+</p>
+<pre>PersonName<sub>1</sub>: Smith,James
+PersonName<sub>2</sub>: O'Brien,Patrick Sean
+PersonName<sub>3</sub>: Mahagedara Patabendige,Minosha Mitsuaki Senakasir
+PersonName<sub>4</sub>: Clifton-Everest,David Ewan
+
+given(PersonName<sub>1</sub>) returns "James"
+given(PersonName<sub>2</sub>) returns "Patrick Sean"
+given(PersonName<sub>3</sub>) returns "Minosha Mitsuaki Senakasir"
+given(PersonName<sub>4</sub>) returns "David Ewan"
+</pre>
+</li>
+<li>
+<p>
+<b>show(<i>PersonName</i>)</b> returns a displayable version of the name
+</p><p>
+It appends the entire Family name to the first Given name (everything 
+before the first space, if any), separated by a single space.
+</p>
+<pre>PersonName<sub>1</sub>: Smith,James
+PersonName<sub>2</sub>: O'Brien,Patrick Sean
+PersonName<sub>3</sub>: Mahagedara Patabendige,Minosha Mitsuaki Senakasir
+PersonName<sub>4</sub>: Clifton-Everest,David Ewan
+PersonName<sub>5</sub>: Bronte,Greta-Anna Maryanne
+
+show(PersonName<sub>1</sub>) returns "James Smith"
+show(PersonName<sub>2</sub>) returns "Patrick O'Brien"
+show(PersonName<sub>3</sub>) returns "Minosha Mahagedara Patabendige"
+show(PersonName<sub>4</sub>) returns "David Clifton-Everest"
+show(PersonName<sub>5</sub>) returns "Greta-Anna Bronte"
+</pre>
+</li>
+</ul>
+<p>
+<b>Hint:</b> test out as many of your C functions as you can <em>outside</em>
+PostgreSQL (e.g. write a simple test driver) before you try to
+install them in PostgreSQL. This will make debugging much easier.
+</p>
+<p>
+You should ensure that your definitions <em>capture the full semantics of
+the operators</em> (e.g. specify commutativity if the operator is commutative).
+You should also ensure that you provide sufficient definitions so that
+users of the <tt>PersonName</tt> type can create <b>hash-based</b> indexes
+on an attribute of type <tt>PersonName</tt>.
+</p>
+
+<h2>Submission</h2>
+<p>
+You need to submit two files: <tt>pname.c</tt> containing the C
+functions that implement the internals of the <tt>PersonName</tt>
+data type, and <tt>pname.source</tt> containing the template SQL commands
+to install the <tt>PersonName</tt> data type into a PostgreSQL server.
+Do not submit the <tt>pname.sql</tt> file, since it contains
+absolute file names which are not helpful in our test environment.
+</p>
+
+<p>Have fun, <i>jas</i></p>
+
+
+</div></body></html>

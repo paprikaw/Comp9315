@@ -1,0 +1,372 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Page Internals</title>
+<link href="Page%20Internals_files/slides.css" rel="stylesheet" type="text/css">
+<script src="Page%20Internals_files/latest.js" async=""></script>
+<script src="Page%20Internals_files/jquery.js"></script><script type="text/javascript" async="" src="Page%20Internals_files/MathJax.js"></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1px; bottom: 2px; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+<link href="Page%20Internals_files/css.css" rel="stylesheet">
+<link href="Page%20Internals_files/prism.css" rel="stylesheet">
+<script src="Page%20Internals_files/sg.js"></script>
+<style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover, .MJXp-munder {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > *, .MJXp-munder > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body>
+ <div class="slideCl1" id="s0">
+<div class="navCl1"><a href="#s1"><span class="nextArrowCl">&gt;&gt;</span></a> </div> <div class="heading">Page Internals</div><p></p><ul class="indexUl" style="font-size: 0.7em;"><li class="i"> <a href="#s1">Pages</a>
+</li><li class="i"> <a href="#s3">Page Formats</a>
+</li><li class="i"> <a href="#s6">Page Formats</a>
+</li><li class="i"> <a href="#s15">Storage Utilisation</a>
+</li><li class="i"> <a href="#s16">Overflows</a>
+</li></ul></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [0/18]</div> <div class="slideCl1    " id="s1">
+<div class="navCl1"> <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s2"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Pages</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Database applications view data as:
+</p><ul>
+<li> a collection of records (tuples)
+</li><li> records can be accessed via a <large><code>TupleId</code></large>/<large><code>RecordId</code></large>/<large><code>RID</code></large>
+</li><li> <large><code>TupleId</code></large> = (<large><code>PageID</code></large> + <large><code>TupIndex</code></large>)
+</li></ul>
+The disk and buffer manager provide the following view:
+<ul>
+<li> data is a sequence of fixed-size pages (aka "blocks")
+</li><li> pages can be (random) accessed via a <large><code>PageID</code></large>
+</li><li> each page contains zero or more tuple values
+</li></ul>
+Page format = how space/tuples are organised within a page
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [1/18]</div> <div class="slideCl1    " id="s2">
+<div class="navCl1"><a href="#s1"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s3"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Pages <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+<br>
+Data files consist of pages containing tuples:
+</p><p><br>
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/data-files.png]" src="Page%20Internals_files/data-files.png">
+</div><p>
+</p><p><br>
+Each data file (in PostgreSQL) is related to one table.
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [2/18]</div> <div class="slideCl1    " id="s3">
+<div class="navCl1"><a href="#s2"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s4"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Ultimately, a <large><code>Page</code></large> is simply an array of bytes (<large><code>byte[]</code></large>).
+</p><p>
+We want to interpret/manipulate it as a collection of <large><code>Record</code></large>s <small>(tuples)</small>.
+</p><p>
+Tuples are addressed by a record ID &nbsp;(<large><code>rid</code></large> = <large><code>(PageId,TupIndex)</code></large>)
+</p><p>
+Typical operations on <large><code>Page</code></large>s:
+</p><ul>
+<li> <large><code>request_page(pid)</code></large> ... <small>get page via its <large><code>PageId</code></large></small>
+</li><li> <large><code>get_record(rid)</code></large> ... <small>get record via its <large><code>TupleId</code></large></small>
+</li><li> <large><code>rid = insert_record(pid,rec)</code></large> ... <small>add new record</small>
+</li><li> <large><code>update_record(rid,rec)</code></large> ... <small>update value of record</small>
+</li><li> <large><code>delete_record(rid)</code></large> ... <small>remove record from page</small>
+</li></ul>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [3/18]</div> <div class="slideCl1    " id="s4">
+<div class="navCl1"><a href="#s3"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s5"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Page format = tuples + data structures allowing tuples to be found
+</p><p>
+Characteristics of <large><code>Page</code></large> formats:
+</p><ul>
+<li> record size variability &nbsp; <small>(fixed, variable)</small>
+</li><li> how free space within <large><code>Page</code></large> is managed
+</li><li> whether some data is stored outside <large><code>Page</code></large>
+<ul>
+<li> does <large><code>Page</code></large> have an associated overflow chain?
+</li><li> are large data values stored elsewhere? <small>(e.g. TOAST)</small>
+</li><li> can one tuple span multiple <large><code>Page</code></large>s?
+</li></ul>
+</li></ul>
+Implementation of <large><code>Page</code></large> operations critically depends on format.
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [4/18]</div> <div class="slideCl1    " id="s5">
+<div class="navCl1"><a href="#s4"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s6"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+For fixed-length records, use <font color="#0000BB">record slots</font>.
+</p><ul>
+<li> <font color="#0000BB">insert</font>: place new record in first available slot
+</li><li> <font color="#0000BB">delete</font>: two possibilities for handling free record slots:
+</li></ul>
+<p></p><div align="center">
+<img alt="[Diagram:Pics/storage/rec-slots.png]" src="Page%20Internals_files/rec-slots.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [5/18]</div> <div class="slideCl1    " id="s6">
+<div class="navCl1"><a href="#s5"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s7"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats</div></td><td align="right"></td></tr></tbody></table>
+<p>
+For variable-length records, must use <font color="#0000BB">slot directory</font>.
+</p><p>
+Possibilities for handling free-space within block:
+</p><ul>
+<li> compacted <small>(one region of free space)</small>
+</li><li> fragmented <small>(distributed free space)</small>
+</li></ul>
+In practice, a combination is useful:
+<ul>
+<li> normally fragmented <small>(cheap to maintain)</small>
+</li><li> compacted when needed <small>(e.g. record won't fit)</small>
+</li></ul>
+<br>
+Important aspect of using slot directory
+<small>
+<ul>
+<li> location of tuple within page can change, tuple index does not change
+</li></ul>
+</small>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [6/18]</div> <div class="slideCl1    " id="s7">
+<div class="navCl1"><a href="#s6"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s8"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Compacted free space:
+&nbsp;<br>
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/free-list.png]" src="Page%20Internals_files/free-list.png">
+</div><p>
+<small>
+Note: "pointers" are implemented as word offsets within block.
+</small>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [7/18]</div> <div class="slideCl1    " id="s8">
+<div class="navCl1"><a href="#s7"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s9"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Fragmented free space:
+&nbsp;<br>
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/free-list1.png]" src="Page%20Internals_files/free-list1.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [8/18]</div> <div class="slideCl1    " id="s9">
+<div class="navCl1"><a href="#s8"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s10"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Initial page state <small>(compacted free space)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert1a.png]" src="Page%20Internals_files/insert1a.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [9/18]</div> <div class="slideCl1    " id="s10">
+<div class="navCl1"><a href="#s9"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s11"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Before inserting record 7 <small>(compacted free space)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert1b.png]" src="Page%20Internals_files/insert1b.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [10/18]</div> <div class="slideCl1    " id="s11">
+<div class="navCl1"><a href="#s10"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s12"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+After inserting record 7 <small>(80 bytes)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert1c.png]" src="Page%20Internals_files/insert1c.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [11/18]</div> <div class="slideCl1    " id="s12">
+<div class="navCl1"><a href="#s11"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s13"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Initial page state <small>(fragmented free space)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert2a.png]" src="Page%20Internals_files/insert2a.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [12/18]</div> <div class="slideCl1    " id="s13">
+<div class="navCl1"><a href="#s12"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s14"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Before inserting record 7 <small>(fragmented free space)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert2b.png]" src="Page%20Internals_files/insert2b.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [13/18]</div> <div class="slideCl1    " id="s14">
+<div class="navCl1"><a href="#s13"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s15"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Page Formats <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+After inserting record 7 <small>(80 bytes)</small> ...
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/insert2c.png]" src="Page%20Internals_files/insert2c.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [14/18]</div> <div class="slideCl1    " id="s15">
+<div class="navCl1"><a href="#s14"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s16"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Storage Utilisation</div></td><td align="right"></td></tr></tbody></table>
+<p>
+How many records can fit in a page? <small>(denoted <i>C</i> = capacity)</small>
+</p><p>
+Depends on:
+</p><ul>
+<li> page size ... typical values: 1KB, 2KB, 4KB, 8KB
+</li><li> record size ... typical values: 64B, 200B, app-dependent
+</li><li> page header data ... typically: 4B - 32B
+</li><li> slot directory ... depends on how many records
+</li></ul>
+We typically consider <i>average</i> record size (<i>R</i>)
+<p>
+Given <i>C</i>, &nbsp; <i>HeaderSize + C*SlotSize + C*R &nbsp;≤&nbsp; PageSize</i>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [15/18]</div> <div class="slideCl1    " id="s16">
+<div class="navCl1"><a href="#s15"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s17"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Overflows</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Sometimes, it may not be possible to insert a record into a page:
+</p><ol>
+<li> no free-space fragment large enough
+</li><li> overall free-space is not large enough
+</li><li> the record is larger than the page
+</li><li> no more free directory slots in page
+</li></ol>
+For case (1), can first try to compact free-space within the page.
+<p>
+If still insufficient space, we need an alternative solution ...
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [16/18]</div> <div class="slideCl1    " id="s17">
+<div class="navCl1"><a href="#s16"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s18"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Overflows <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+File organisation determines how cases (2)..(4) are handled.
+</p><p>
+If records may be inserted anywhere that there is free space
+</p><ul>
+<li> cases (2) and (4) can be handled by making a new page
+</li><li> case (3) requires either spanned records or "overflow file"
+</li></ul>
+If file organisation determines record placement (e.g. hashed file)
+<ul>
+<li> cases (2) and (4) require an "overflow page"
+</li><li> case (3) requires an "overflow file"
+</li></ul>
+<small>
+With overflow pages, <i>rid</i> structure may need modifying <i>(rel,page,ovfl,rec)</i>
+</small>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [17/18]</div> <div class="slideCl1    " id="s18">
+<div class="navCl1"><a href="#s17"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>   </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Overflows <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Overflow files for very large records and BLOBs:
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/ovflow-file.png]" src="Page%20Internals_files/ovflow-file.png">
+</div><p>
+Record-based handling of overflows:
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/storage/ovflow-record.png]" src="Page%20Internals_files/ovflow-record.png">
+</div><p>
+</p><p>
+<small>
+We discuss overflow pages in more detail when covering Hash Files.
+</small>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Page Internals ♢ [18/18]</div><p></p><hr><p>
+<span style="font-size:11px;color: grey;">Produced: 23 Feb 2021</span>
+ <script src="Page%20Internals_files/prism.js"></script>   
+ <script src="Page%20Internals_files/sg.js"></script>   
+
+
+</p></body></html>
