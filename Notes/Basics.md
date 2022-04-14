@@ -30,3 +30,25 @@ PGSQL的储存结构
 Low level的过程
 
 ![picture 5](images/4921ba1b4b18464d0807100cc8987fc86abb3567feb25d68dd1163abe2c12dc2.png)
+
+
+
+# 基础命令
+
+## pg_ctl
+``` bash
+pg_ctl start
+server starting
+```
+``` bash
+pg_ctl stop
+waiting for server to shut down.... done
+```
+``` bash
+server stopped
+pg_ctl status
+```
+``` bash
+pg_ctl: server is running (PID: nnnnnn)
+/localstorage/z5555555/pgsql/bin/postgres
+```

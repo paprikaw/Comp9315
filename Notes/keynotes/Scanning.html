@@ -1,0 +1,418 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Scanning</title>
+<link href="Scanning_files/slides.css" rel="stylesheet" type="text/css">
+<script src="Scanning_files/latest.js" async=""></script>
+<script src="Scanning_files/jquery.js"></script>
+<link href="Scanning_files/css.css" rel="stylesheet">
+<link href="Scanning_files/prism.css" rel="stylesheet">
+<script src="Scanning_files/sg.js"></script><script type="text/javascript" async="" src="Scanning_files/MathJax.js"></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1px; bottom: 2px; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style>
+<style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover, .MJXp-munder {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > *, .MJXp-munder > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+<body><div id="MathJax_Message" style="display: none;"></div>
+ <div class="slideCl1" id="s0">
+<div class="navCl1"><a href="#s1"><span class="nextArrowCl">&gt;&gt;</span></a> </div> <div class="heading">Scanning</div><p></p><ul class="indexUl" style="font-size: 0.7em;"><li class="i"> <a href="#s1">Scanning</a>
+</li><li class="i"> <a href="#s5">Selection via Scanning</a>
+</li><li class="i"> <a href="#s7">Iterators</a>
+</li><li class="i"> <a href="#s8">Example Query</a>
+</li><li class="i"> <a href="#s9"> <large><code>next_tuple()</code></large> Function</a>
+</li><li class="i"> <a href="#s11">Relation Copying</a>
+</li><li class="i"> <a href="#s14">Scanning in PostgreSQL</a>
+</li><li class="i"> <a href="#s16">Scanning in other File Structures</a>
+</li></ul></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [0/16]</div> <div class="slideCl1    " id="s1">
+<div class="navCl1"> <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s2"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Consider executing the query:
+</p><p></p><pre>select * from Rel;
+</pre><p>
+where the relation has a file structure like:
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/scansortproj/file-struct0.png]" src="Scanning_files/file-struct0.png">
+</div><p>
+<br>
+This would done by a simple scan of all records/tuples.
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [1/16]</div> <div class="slideCl1    " id="s2">
+<div class="navCl1"><a href="#s1"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s3"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Abstract view of how the scan might be implemented:
+</p><p></p><pre>for each tuple T in relation Rel {
+   add tuple T to result set
+}
+</pre><p>
+Operational view:
+</p><p></p><pre style="font-size:90%">for each page P in file of relation Rel {
+   for each tuple T in page P {
+      add tuple T to result set
+   }
+}
+</pre><p>
+<br>
+Cost = read every data page once = <i>b</i>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [2/16]</div> <div class="slideCl1    " id="s3">
+<div class="navCl1"><a href="#s2"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s4"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Consider a file with overflow pages, e.g.
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/scansortproj/file-struct1.png]" src="Scanning_files/file-struct1.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [3/16]</div> <div class="slideCl1    " id="s4">
+<div class="navCl1"><a href="#s3"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s5"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+In this case, the implementation changes to:
+</p><p></p><pre>for each page P in data file of relation Rel {
+    for each tuple t in page P {
+        add tuple t to result set
+    }
+    for each overflow page V of page P {
+        for each tuple t in page V {
+            add tuple t to result set
+}   }   }
+</pre><p>
+Cost: read each data page and each overflow page once
+</p><p>
+<i>Cost = b + b<sub>Ov</sub></i>
+</p><p>
+where <i>b<sub>Ov</sub></i> = total number of overflow pages
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [4/16]</div> <div class="slideCl1    " id="s5">
+<div class="navCl1"><a href="#s4"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s6"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Selection via Scanning</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Consider a <i>one</i> query like:
+</p><p></p><pre>select * from Employee where id = 762288;
+</pre><p>
+In an unordered file, search for matching tuple requires:
+</p><p><br>
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/scansortproj/file-search.png]" src="Scanning_files/file-search.png">
+</div><p>
+</p><p><br>
+Guaranteed at most one answer; but could be in any page.
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [5/16]</div> <div class="slideCl1    " id="s6">
+<div class="navCl1"><a href="#s5"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s7"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Selection via Scanning <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Overview of scan process:
+</p><p></p><pre>for each page P in relation Employee {
+    for each tuple t in page P {
+        if (t.id == 762288) return t
+}   }
+</pre><p>
+Cost analysis for <i>one</i> searching in unordered file
+</p><ul>
+<li> best case: read one page, find tuple
+</li><li> worst case: read all <i>b</i> pages, find in last <small>(or don't find)</small>
+</li><li> average case: read half of the pages (<i>b/2</i>)
+</li></ul>
+Page Costs:
+&nbsp;
+<i>Cost<sub>avg</sub> = b/2</i> &nbsp;&nbsp;
+<i>Cost<sub>min</sub> = 1</i> &nbsp;&nbsp;
+<i>Cost<sub>max</sub> = b</i>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [6/16]</div> <div class="slideCl1    " id="s7">
+<div class="navCl1"><a href="#s6"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s8"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Iterators</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Access methods typically involve <font color="#0000BB">iterators</font>, e.g.
+</p><p><br>
+<large><font color="#008800"><b><code>Scan s = start_scan(Relation r, ...)</code></b></font></large>
+</p><ul>
+<li> commence a scan of relation <large><code>r</code></large>
+</li><li> <large><code>Scan</code></large> may include condition to implement <large><code>WHERE</code></large>-clause
+</li><li> <large><code>Scan</code></large> holds data on progress through file <small>(e.g. current page)</small>
+</li></ul>
+<p><br>
+<large><font color="#008800"><b><code>Tuple next_tuple(Scan s)</code></b></font></large>
+</p><ul>
+<li> return <large><code>Tuple</code></large> immediately following last accessed one
+</li><li> returns <large><code>NULL</code></large> if no more <large><code>Tuples</code></large> left in the relation
+</li></ul>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [7/16]</div> <div class="slideCl1    " id="s8">
+<div class="navCl1"><a href="#s7"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s9"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Example Query</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Example: simple scan of a table ...
+</p><p></p><pre>select name from Employee
+</pre><p>
+implemented as:
+</p><p></p><pre>DB db = openDatabase("myDB");
+Relation r = openRelation(db,"Employee",READ);
+Scan s = start_scan(r);
+Tuple t;  <span class="comment">// current tuple</span>
+while ((t = next_tuple(s)) != NULL) {
+   char *name = <font color="#008800">getStrField</font>(t,2);
+   printf("%s\n", name);
+}
+</pre><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [8/16]</div> <div class="slideCl1    " id="s9">
+<div class="navCl1"><a href="#s8"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s10"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖  <large><code>next_tuple()</code></large> Function</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Consider the following possible <large><font color="#008800"><b><code>Scan</code></b></font></large> data structure
+</p><p></p><pre>typedef ScanData *Scan;
+
+typedef struct {
+   Relation rel;
+   Page     *page;   <span class="comment">// Page buffer</span>
+   int      curPID;  <span class="comment">// current pid</span>
+   int      curTID;  <span class="comment">// current tid</span>
+} ScanData;
+</pre><p>
+Assume tuples are indexed 0..<large><code>nTuples(p)-1</code></large>
+</p><p>
+Assume pages are indexed 0..<large><code>nPages(rel)-1</code></large>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [9/16]</div> <div class="slideCl1    " id="s10">
+<div class="navCl1"><a href="#s9"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s11"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖  <large><code>next_tuple()</code></large> Function <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+Implementation of &nbsp;<large><font color="#008800"><b><code>Tuple next_tuple(Scan)</code></b></font></large>&nbsp; function
+</p><p></p><pre>Tuple next_tuple(Scan s)
+{
+   if (s-&gt;curTID &gt;= nTuples(s-&gt;page)-1) {
+      <span class="comment">// get a new page; exhausted current page</span>
+      s-&gt;curPID++;
+      if (s-&gt;curPID &gt;= nPages(s-&gt;rel))
+         return NULL;
+      else {
+         s-&gt;page = get_page(s-&gt;rel, s-&gt;curPID);
+         s-&gt;curTID = -1;
+      }
+   }
+   s-&gt;curTID++;
+   return get_tuple(s-&gt;rel, s-&gt;page, s-&gt;curTID);
+}
+</pre><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [10/16]</div> <div class="slideCl1    " id="s11">
+<div class="navCl1"><a href="#s10"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s12"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Relation Copying</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Consider an SQL statement like:
+</p><p></p><pre>create table T as (select * from S);
+</pre><p>
+Effectively, copies data from one table to a new table.
+</p><p>
+Process:
+</p><p></p><pre>make empty relation T
+s = start scan of S
+while (t = next_tuple(s)) {
+    insert tuple t into relation T
+}
+</pre><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [11/16]</div> <div class="slideCl1    " id="s12">
+<div class="navCl1"><a href="#s11"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s13"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Relation Copying <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+It is possible that <large><code>T</code></large> is smaller than <large><code>S</code></large>
+</p><ul>
+<li> may be unused free space in <large><code>S</code></large> where tuples were removed
+</li><li> if <large><code>T</code></large> is built by simple append, will be compact
+</li></ul>
+<p>
+</p><p></p><div align="center">
+<img alt="[Diagram:Pics/scansortproj/copy-files.png]" src="Scanning_files/copy-files.png">
+</div><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [12/16]</div> <div class="slideCl1    " id="s13">
+<div class="navCl1"><a href="#s12"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s14"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Relation Copying <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+In terms of existing relation/page/tuple operations:
+</p><p></p><pre style="font-size:80%">Relation in;       <span class="comment">// relation handle (incl. files)</span>
+Relation out;      <span class="comment">// relation handle (incl. files)</span>
+int ipid,opid,tid; <span class="comment">// page and record indexes</span>
+Record rec;        <span class="comment">// current record (tuple)</span>
+Page ibuf,obuf;    <span class="comment">// input/output file buffers</span>
+
+in = openRelation("S", READ);
+out = openRelation("T", NEW|WRITE);
+clear(obuf);  opid = 0;
+for (ipid = 0; ipid &lt; nPages(in); ipid++) {
+    ibuf = <font color="#996600">get_page</font>(in, ipid);
+    for (tid = 0; tid &lt; nTuples(ibuf); tid++) {
+        rec = get_record(ibuf, tid);
+        if (!hasSpace(obuf,rec)) {
+            <font color="#996600">put_page</font>(out, opid++, obuf);
+            clear(obuf);
+        }
+        insert_record(obuf,rec);
+}   }
+if (nTuples(obuf) &gt; 0) <font color="#996600">put_page</font>(out, opid, obuf);
+</pre><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [13/16]</div> <div class="slideCl1    " id="s14">
+<div class="navCl1"><a href="#s13"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s15"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning in PostgreSQL</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Scanning defined in: <font color="#000099">backend/access/heap/heapam.c</font>
+</p><p>
+Implements iterator data/operations:
+</p><ul>
+<li> <large><font color="#008800"><b><code>HeapScanDesc</code></b></font></large> ... struct containing iteration state
+</li><li> <large><font color="#008800"><b><code>scan = heap_beginscan(rel,...,nkeys,keys)</code></b></font></large>
+</li><li> <large><font color="#008800"><b><code>tup = heap_getnext(scan, direction)</code></b></font></large>
+</li><li> <large><font color="#008800"><b><code>heap_endscan(scan)</code></b></font></large> ... frees up <large><code>scan</code></large> struct
+</li><li> <large><font color="#008800"><b><code>res = HeapKeyTest(tuple,...,nkeys,keys)</code></b></font></large> <br>
+	<small>... performs <large><code>ScanKeys</code></large> tests on tuple ... is it a result tuple?</small>
+</li></ul>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [14/16]</div> <div class="slideCl1    " id="s15">
+<div class="navCl1"><a href="#s14"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>  <a href="#s16"><span class="nextArrowCl"> &gt;&gt; </span></a> </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning in PostgreSQL <span style="font-size:67%">(cont)</span></div></td><td align="right"></td></tr></tbody></table>
+<p>
+</p><p></p><pre style="font-size:90%">typedef HeapScanDescData *<large><font color="#008800"><b><code>HeapScanDesc</code></b></font></large>;
+
+typedef struct HeapScanDescData
+{
+  <span class="comment">// scan parameters </span>
+  Relation      rs_rd;        <span class="comment">// heap relation descriptor </span>
+  Snapshot      rs_snapshot;  <span class="comment">// snapshot ... tuple visibility </span>
+  int           rs_nkeys;     <span class="comment">// number of scan keys </span>
+  ScanKey       rs_key;       <span class="comment">// array of scan key descriptors </span>
+  ...
+  <span class="comment">// state set up at initscan time </span>
+  PageNumber    rs_npages;    <span class="comment">// number of pages to scan </span>
+  PageNumber    rs_startpage; <span class="comment">// page # to start at </span>
+  ...
+  <span class="comment">// scan current state, initally set to invalid </span>
+  HeapTupleData rs_ctup;      <span class="comment">// current tuple in scan</span>
+  PageNumber    rs_cpage;     <span class="comment">// current page # in scan</span>
+  Buffer        rs_cbuf;      <span class="comment">// current buffer in scan</span>
+   ...
+} <font color="#008800">HeapScanDescData</font>;
+</pre><p>
+</p></div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [15/16]</div> <div class="slideCl1    " id="s16">
+<div class="navCl1"><a href="#s15"><span class="prevArrowCl"> &lt;&lt; </span></a>  <a href="#s0"><span class="upArrowCl">∧</span></a>   </div> <table width="100%" cellpadding="0">
+<tbody><tr valign="top"><td align="left"><div class="heading">❖ Scanning in other File Structures</div></td><td align="right"></td></tr></tbody></table>
+<p>
+Above examples are for <font color="#0000BB">heap</font> files
+</p><ul>
+<li> simple, unordered, maybe indexed, no hashing
+</li></ul>
+Other access file structures in PostgreSQL:
+<ul>
+<li> <large><font color="#008800"><b><code>btree</code></b></font></large>, <large><font color="#008800"><b><code>hash</code></b></font></large>, <large><font color="#008800"><b><code>gist</code></b></font></large>, <large><font color="#008800"><b><code>gin</code></b></font></large>
+</li><li> each implements:
+<ul>
+<li> startscan, getnext, endscan
+</li><li> insert, delete &nbsp;<tiny>(update=delete+insert)</tiny>
+</li><li> other file-specific operators
+</li></ul>
+</li></ul>
+</div>
+<div class="slideNumCl2">COMP9315 21T1 ♢ Scanning ♢ [16/16]</div><p></p><hr><p>
+<span style="font-size:11px;color: grey;">Produced: 7 Mar 2021</span>
+ <script src="Scanning_files/prism.js"></script>   
+ <script src="Scanning_files/sg.js"></script>   
+
+
+</p></body></html>

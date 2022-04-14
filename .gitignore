@@ -1,0 +1,8 @@
+./Ass02/*.o
+./Ass02/insert
+./Ass02/dump
+./Ass02/create
+./Ass02/test
+./Ass02/select
+./Ass02/stats
+./Ass02/gendata

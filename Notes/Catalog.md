@@ -31,4 +31,4 @@ select t.relname, a.attname, a.attnum
        and a.attnum > 0
 ```
 
-[具体代码](../Week01/Ex/Ex4/schema.sql)j
+[具体代码](../Week01/Ex/Ex4/schema.sql)
