@@ -114,7 +114,7 @@ void closeRelation(Reln r)
 	free(r);
 }
 
-// insert a new tuple into a relation
+// insert a new query into a relation
 // returns index of bucket where inserted
 // - index always refers to a primary data page
 // - the actual insertion page may be either a data page or an overflow page
@@ -127,7 +127,7 @@ PageID addToRelation(Reln r, Tuple t)
 	// char buf[MAXBITS+1];
 	h = tupleHash(r,t);
 	if (r->depth == 0)
-		p = 1;
+		p = 0;
 	else {
 		p = getLower(h, r->depth);
 		if (p < r->sp) p = getLower(h, r->depth+1);
@@ -177,7 +177,7 @@ PageID addToRelation(Reln r, Tuple t)
 		assert(prevpg != NULL);
 		// make new ovflow page
 		PageID newp = addPage(r->ovflow);
-		// insert tuple into new page
+		// insert query into new page
 		Page newpg = getPage(r->ovflow,newp);
         if (addToPage(newpg,t) != OK) return NO_PAGE;
         putPage(r->ovflow,newp,newpg);

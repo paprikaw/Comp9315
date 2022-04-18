@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 {
 	Reln r;  // handle on the open relation
 	Query q;  // processed version of query string
-	Tuple t;  // tuple pointer
+	Tuple t;  // query pointer
 	char err[MAXERRMSG];  // buffer for error messages
 	int verbose;  // show extra info on query progress
 	char *rname;  // name of table/file

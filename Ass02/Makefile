@@ -18,8 +18,10 @@ select: select.o $(LIBS)
 stats:  stats.o $(LIBS)
 gendata: gendata.o $(LIBS)
 test: test.o $(LIBS)
+test2: test2.o $(LIBS)
 
 test.o: test.c reln.h chvec.h
+test2.o: test2.c reln.h chvec.h
 create.o: create.c defs.h
 dump.o: dump.c defs.h reln.h page.h
 insert.o: insert.c defs.h reln.h tuple.h

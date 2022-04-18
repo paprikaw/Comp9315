@@ -2,7 +2,7 @@
 // part of Multi-attribute linear-hashed files
 // Ask a query on a named file
 // Usage:  ./create  [-v]  RelName  #attrs  #pages  ChoiceVector
-// where #attrs = # of attributes in each tuple
+// where #attrs = # of attributes in each query
 //	   #pages = initial (empty) pages in File
 //	   ChoiceVector = attr,bit:attr,bit:...
 
@@ -20,7 +20,7 @@
 int main(int argc, char **argv)
 {
 	//Reln r;  // handle on the data file
-	int nattrs;  // number of attributes in each tuple
+	int nattrs;  // number of attributes in each query
 	int npages;  // initial number of pages
 	char err[MAXERRMSG];  // buffer for error messages
 	int verbose;  // show extra info on query progress
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	    verbose = 0; rname = argv[1]; attrs = argv[2]; pages = argv[3]; cv = argv[4];
 	}
 
-	// how many attributes in each tuple
+	// how many attributes in each query
 	nattrs = atoi(attrs);
 	if (nattrs < 2 || nattrs > 10) {
 		sprintf(err, "Invalid #attrs: %d (must be 1 < # < 11)", nattrs);

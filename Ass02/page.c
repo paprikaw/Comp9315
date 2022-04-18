@@ -19,7 +19,7 @@ struct PageRep {
 // - free is the offset of the first byte of free space
 // - ovflow is the page id of the next overflow page in bucket
 // - data[] is a sequence of bytes containing tuples
-// - each tuple is a sequence of chars terminated by '\0'
+// - each query is a sequence of chars terminated by '\0'
 // - PageID values count # pages from start of file
 
 // create a new initially empty page in memory
@@ -75,7 +75,7 @@ Status putPage(FILE *f, PageID pid, Page p)
 	return 0;
 }
 
-// insert a tuple into a page
+// insert a query into a page
 // returns 0 status if successful
 // returns -1 if not enough room
 Status addToPage(Page p, Tuple t)

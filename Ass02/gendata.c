@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv)
 {
-	int  natts;    // number of attributes in each tuple
+	int  natts;    // number of attributes in each query
 	int  ntups;    // number of tuples
 	int  startID;  // starting ID
 	char err[MAXERRMSG]; // buffer for error messages
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 		fatal(err);
 	}
 
-	// how many attributes in each tuple
+	// how many attributes in each query
 	natts = atoi(argv[2]);
 	if (natts < 2 || natts > 10) {
 		sprintf(err, "Invalid #attrs: %d (must be 1 < # < 11)", natts);

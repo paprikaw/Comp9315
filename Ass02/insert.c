@@ -15,7 +15,7 @@
 int main(int argc, char **argv)
 {
 	Reln r;  // handle on the open relation
-	Tuple t;  // tuple buffer
+	Tuple t;  // query buffer
 	char err[2*MAXERRMSG];  // buffer for error messages
 	char tup[MAXTUPLEN];  // buffer for printable tuples
 	int verbose;  // show extra info on query progress

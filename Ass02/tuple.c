@@ -1,4 +1,4 @@
-// tuple.c ... functions on tuples
+// query.c ... functions on tuples
 // part of Multi-attribute Linear-hashed Files
 // Last modified by John Shepherd, July 2019
 
@@ -9,14 +9,14 @@
 #include "chvec.h"
 #include "bits.h"
 
-// return number of bytes/chars in a tuple
+// return number of bytes/chars in a query
 
 int tupLength(Tuple t)
 {
 	return strlen(t);
 }
 
-// reads/parses next tuple in input
+// reads/parses next query in input
 
 Tuple readTuple(Reln r, FILE *in)
 {
@@ -29,7 +29,7 @@ Tuple readTuple(Reln r, FILE *in)
 	char *c; int nf = 1;
 	for (c = line; *c != '\0'; c++)
 		if (*c == ',') nf++;
-	// invalid tuple
+	// invalid query
 	if (nf != nattrs(r)) return NULL;
     return copyString(line); // needs to be free'd sometime
 }
@@ -43,11 +43,11 @@ void tupleVals(Tuple t, char **vals)
 	for (;;) {
 		while (*c != ',' && *c != '\0') c++;
 		if (*c == '\0') {
-			// end of tuple; add last field to vals
+			// end of query; add last field to vals
 			vals[i++] = copyString(c0);
 			break;
 		}
-		else {
+		else if (*c == ','){
 			// end of next field; add to vals
 			*c = '\0';
 			vals[i++] = copyString(c0);
@@ -65,7 +65,7 @@ void freeVals(char **vals, int nattrs)
 	for (i = 0; i < nattrs; i++) free(vals[i]);
 }
 
-// hash a tuple using the choice vector
+// hash a query using the choice vector
 // TODO: actually use the choice vector to make the hash
 
 Bits tupleHash(Reln r, Tuple t)
@@ -75,11 +75,41 @@ Bits tupleHash(Reln r, Tuple t)
     // 分配一个二维数组的内存
 	char **vals = malloc(nvals*sizeof(char *));
 	assert(vals != NULL);
+    // extract values into an array of strings
 	tupleVals(t, vals);
-	Bits hash = hash_any((unsigned char *)vals[0],strlen(vals[0]));
-	bitsString(hash,buf);
-	printf("hash(%s) = %s\n", vals[0], buf);
-	return hash;
+
+    // extract choice vector from ration
+    ChVecItem *chVec = chvec(r);
+    // If there is no choice factor, raise error
+    if (chVec == NULL) {
+        printf("No choice vector, please checck");
+        return 0;
+    }
+
+    // Initialize a hash array
+    Bits *hashes = malloc(sizeof (hashes) * nattrs(r));
+    Bool *is_hashed = malloc(sizeof (Bool) * nattrs(r));
+    for (int i = 0; i < nattrs(r); i++) {
+        is_hashed[i] = FALSE;
+    }
+    Bits hash = 0;
+    for (int i = 0; i < MAXCHVEC; i++) {
+        // 对于每一个choice item遍历，并且将对应的
+        Byte attrbute = chVec[i].att;
+        Byte bit = chVec[i].bit;
+        if (is_hashed[attrbute] == FALSE) {
+            hashes[attrbute] = hash_any((unsigned char *)vals[attrbute],strlen(vals[attrbute]));
+            is_hashed[attrbute] = TRUE;
+        }
+        if (bitIsSet(hashes[attrbute], bit)) {
+            hash = setBit(hash, i);
+        }
+    }
+    free(hashes);
+    free(is_hashed);
+    bitsString(hash, buf);
+    printf("hash(%s) = %s\n", t, buf);
+    return hash;
 }
 
 // compare two tuples (allowing for "unknown" values)
@@ -103,7 +133,7 @@ Bool tupleMatch(Reln r, Tuple t1, Tuple t2)
 	return match;
 }
 
-// puts printable version of tuple in user-supplied buffer
+// puts printable version of query in user-supplied buffer
 
 void tupleString(Tuple t, char *buf)
 {
