@@ -20,6 +20,7 @@ Bits *getCandidateHashes(Query q);
 // compare a query to a actual query
 int cmpQueryTuple(char* query, Tuple tuple, int nattri);
 int numUnknown(Query q);
+int twoToN(int n);
 struct QueryRep {
 	Reln    rel;       // need to remember Relation info
 	Bits    known;     // the hash value from MAH
@@ -234,8 +235,13 @@ Bits getPidFromHash(Bits hash, Reln r) {
     if (depth(r) == 0)
         p = 0;
     else {
-        p = getLower(hash, depth(r));
-        if (p < splitp(r)) p = getLower(hash, depth(r)+1);
+        if (splitp(r) != 0) {
+            p = getLower(hash, depth(r) + 1);
+        } else {
+            p = getLower(hash, depth(r));
+        }
+        // p = getLower(hash, depth(r));
+        // if (p < splitp(r)) p = getLower(hash, depth(r)+1);
     }
     return p;
 }
@@ -313,4 +319,8 @@ int numUnknown(Query q) {
         }
     }
     return n_unknown;
+}
+
+int twoToN(int n) {
+    return 1 << n;
 }

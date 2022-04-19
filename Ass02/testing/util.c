@@ -20,7 +20,3 @@ char *copyString(char *str)
 	strcpy(new, str);
 	return new;
 }
-
-int twoToN(int n) {
-    return 1 << n;
-}

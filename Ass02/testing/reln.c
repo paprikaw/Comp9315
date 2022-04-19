@@ -16,6 +16,7 @@
 void splitPage (Reln r);
 // void splitPage ();
 Bits getPidFromHashByDepth(Bits hash, int depth);
+int twoToNv1(int n);
 struct RelnRep {
 	Count  nattrs; // number of attributes
 	Count  depth;  // depth of main data file
@@ -133,7 +134,7 @@ PageID addToRelation(Reln r, Tuple t)
       if (((r->ntups + 1) % C)  == 0) {
           splitPage(r);
           //split pointer 到达 2 ^ d
-           if (r->sp == twoToN(r->depth) - 1) {
+           if (r->sp == twoToNv1(r->depth) - 1) {
                 r->depth++;
                  r->sp = 0;
            } else {
@@ -257,7 +258,7 @@ void relationStats(Reln r)
 void splitPage (Reln r) {
 
      // left 和 right 的page ID
-      PageID new_pid = twoToN(r->depth) + r->sp;
+      PageID new_pid = twoToNv1(r->depth) + r->sp;
       PageID old_pid = r->sp;
 
       int cur_pos = 0;
@@ -325,8 +326,8 @@ void splitPage (Reln r) {
                  left_page_id = newp;
                  left_page = getPage(ovflowFile(r), left_page_id);
                  }
-                 // assert(addToPage(left_page, curr_tuple) == OK);
-                 addToPage(left_page, curr_tuple);
+                 assert(addToPage(left_page, curr_tuple) == OK);
+                 // addToPage(left_page, curr_tuple);
              } else {
                  if (addToPage(right_page,curr_tuple) == OK) {
                      continue;
@@ -359,8 +360,8 @@ void splitPage (Reln r) {
                     right_page_id = newp;
                     right_page = getPage(ovflowFile(r), right_page_id);
                  }
-                 // assert(addToPage(right_page, curr_tuple) == OK);
-                 addToPage(right_page, curr_tuple);
+                 assert(addToPage(right_page, curr_tuple) == OK);
+                 // addToPage(right_page, curr_tuple);
                  // if (!is_right_ov) {
                  //     // 将tuple插入到回buffer
                  //     is_right_ov = 1;
@@ -422,4 +423,7 @@ Bits getPidFromHashByDepth(Bits hash, int depth) {
      // compute PageID of first page
      PageID p = getLower(hash, depth);
      return p;
+}
+int twoToNv1(int n) {
+    return 1 << n;
 }

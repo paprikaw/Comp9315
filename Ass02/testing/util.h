@@ -9,5 +9,4 @@
 
 void fatal(char *);
 char *copyString(char *);
-int twoToN(int n);
 #endif
